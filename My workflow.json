@@ -1,0 +1,294 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "362cfacd-0727-4e91-8a25-b2cedaf80179",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.football-data.org/v4/competitions/PL/standings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Auth-Token",
+              "value": "fb606564a15e4094baaf2f3a63b19d9f"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        16,
+        -64
+      ],
+      "id": "e25af002-f6f2-4cb4-81c4-2400eb167a9d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "standings[0].table",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "ecd43d92-6a55-420d-be51-4e65155ba558",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"Position\": {{ $json.position }},\n  \"team_id\": {{ $json.team.id }},\n  \"team_name\":\t{{ $json.team.name }},\n  \"played\": {{ $json.playedGames }},\n  \"won\": {{ $json.won }},\n  \"draw\": {{ $json.draw }},\n  \"lost\": {{ $json.lost }},\n  \"points\":{{ $json.points }},\n  \"goals_for\":{{ $json.goalsFor }},\n  \"goals_against\":{{ $json.goalsAgainst }},\n  \"goal_diff\":\t{{ $json.goalDifference }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -64
+      ],
+      "id": "fdfd725b-75eb-478d-90cd-2029f316a8e1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "# Get the JSON data from the HTTP Request (Extract) node\n# We use _items[0][\"json\"] for this specific version of n8n\ndata = _items[0][\"json\"]\n\n# The API stores the total league table in standings[0]['table']\nleague_table = data['standings'][0]['table']\n\n# Create an empty list to hold our cleaned data\ntransformed_data = []\n\n# Loop through each team's row in the API response\nfor row in league_table:\n    \n    # Map the nested API data to your exact custom fields\n    team_stats = {\n        \"Position\": row['position'],\n        \"team_id\": row['team']['id'],\n        \"team_name\": row['team']['name'],\n        \"played\": row['playedGames'],\n        \"won\": row['won'],\n        \"draw\": row['draw'],\n        \"lost\": row['lost'],\n        \"points\": row['points'],\n        \"goals_for\": row['goalsFor'],\n        \"goals_against\": row['goalsAgainst'],\n        \"goal_diff\": row['goalDifference']\n    }\n    \n    # n8n expects the data to be wrapped inside a \"json\" key\n    transformed_data.append({\"json\": team_stats})\n\n# Return the clean, flat list of teams\nreturn transformed_data"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        176
+      ],
+      "id": "41d90366-7c04-4a08-aa41-4909a4401cae",
+      "name": "Code in Python"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "premier_league_standings",
+          "mode": "list",
+          "cachedResultName": "premier_league_standings"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "team_id"
+          ],
+          "schema": [
+            {
+              "id": "team_id",
+              "displayName": "team_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "team_name",
+              "displayName": "team_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "played",
+              "displayName": "played",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "won",
+              "displayName": "won",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "draw",
+              "displayName": "draw",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "lost",
+              "displayName": "lost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "points",
+              "displayName": "points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "goals_for",
+              "displayName": "goals_for",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "goals_against",
+              "displayName": "goals_against",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "goal_diff",
+              "displayName": "goal_diff",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        432,
+        128
+      ],
+      "id": "1d28668e-32b2-4ec0-813e-3fb51aebeebe",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "Qa1Kvjpym0RO74GC",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in Python",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "43025674-95e4-4a60-95ce-367dd6eb4cb3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e666d85ff0e2cdb73be423a7714693a4e3357e95ea2d84669dcebf8c58e8c4fe"
+  },
+  "id": "mBHNEa7x55G0gmxW",
+  "tags": []
+}
