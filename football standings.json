@@ -1,5 +1,5 @@
 {
-  "name": "My workflow",
+  "name": "football standings",
   "nodes": [
     {
       "parameters": {
@@ -73,7 +73,7 @@
     {
       "parameters": {
         "language": "pythonNative",
-        "pythonCode": "# Get the JSON data from the HTTP Request (Extract) node\n# We use _items[0][\"json\"] for this specific version of n8n\ndata = _items[0][\"json\"]\n\n# The API stores the total league table in standings[0]['table']\nleague_table = data['standings'][0]['table']\n\n# Create an empty list to hold our cleaned data\ntransformed_data = []\n\n# Loop through each team's row in the API response\nfor row in league_table:\n    \n    # Map the nested API data to your exact custom fields\n    team_stats = {\n        \"Position\": row['position'],\n        \"team_id\": row['team']['id'],\n        \"team_name\": row['team']['name'],\n        \"played\": row['playedGames'],\n        \"won\": row['won'],\n        \"draw\": row['draw'],\n        \"lost\": row['lost'],\n        \"points\": row['points'],\n        \"goals_for\": row['goalsFor'],\n        \"goals_against\": row['goalsAgainst'],\n        \"goal_diff\": row['goalDifference']\n    }\n    \n    # n8n expects the data to be wrapped inside a \"json\" key\n    transformed_data.append({\"json\": team_stats})\n\n# Return the clean, flat list of teams\nreturn transformed_data"
+        "pythonCode": "# Get the JSON data from the HTTP Request (Extract) node\ndata = _items[0][\"json\"]\n\n# The API stores the total league table in standings[0]['table']\nleague_table = data['standings'][0]['table']\n\n# Create an empty list to hold our cleaned data\ntransformed_data = []\n\n# Loop through each team's row in the API response\nfor row in league_table:\n    \n    # Map the nested API data to your exact custom fields\n    team_stats = {\n        \"Position\": row['position'],\n        \"team_id\": row['team']['id'],\n        \"team_name\": row['team']['name'],\n        \"played\": row['playedGames'],\n        \"won\": row['won'],\n        \"draw\": row['draw'],\n        \"lost\": row['lost'],\n        \"points\": row['points'],\n        \"goals_for\": row['goalsFor'],\n        \"goals_against\": row['goalsAgainst'],\n        \"goal_diff\": row['goalDifference'],\n      }\n    \n    # n8n expects the data to be wrapped inside a \"json\" key\n    transformed_data.append({\"json\": team_stats})\n\n# Return the clean, flat list of teams\nreturn transformed_data"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -214,8 +214,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        432,
-        128
+        608,
+        112
       ],
       "id": "1d28668e-32b2-4ec0-813e-3fb51aebeebe",
       "name": "Insert or update rows in a table",
@@ -277,14 +277,25 @@
           }
         ]
       ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "43025674-95e4-4a60-95ce-367dd6eb4cb3",
+  "versionId": "be93c892-50db-4b23-a6e5-be4cf1949d57",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e666d85ff0e2cdb73be423a7714693a4e3357e95ea2d84669dcebf8c58e8c4fe"
