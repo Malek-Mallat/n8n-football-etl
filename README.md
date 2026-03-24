@@ -42,3 +42,11 @@ The workflow expects a table named `premier_league_standings` with the following
 4. Update the **HTTP Request** node with your own `X-Auth-Token` if necessary.
 5. Configure the **Postgres** node with your database credentials.
 6. Activate the workflow!
+
+## 📊 Power BI Dashboard
+I connected Power BI directly to the Neon PostgreSQL database to visualize the live data. 
+Here is a snapshot of the dashboard:
+
+![Premier League Dashboard](dashboard_screenshot.png)
+
+*(You can download the `.pbix` file in this repository to interact with the data yourself!)*
