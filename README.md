@@ -44,15 +44,6 @@ The workflow expects a table named `premier_league_standings` with the following
 5. Configure the **Postgres** node with your database credentials.
 6. Activate the workflow!
 
-## Power BI Visualizations
-
-The `powerBI` folder contains PNG images of Power BI dashboards created from the Premier League standings data:
-
-- `1.PNG`: Example visualization 1
-- `2.PNG`: Example visualization 2
-- `3.PNG`: Example visualization 3
-
-You can use these images as reference or inspiration for your own Power BI dashboards.
 
 
 
